@@ -5,7 +5,7 @@ export function activate(context: vscode.ExtensionContext) {
 	try {
 		trackerViewProvider.Init(context);
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 	}
 
 }

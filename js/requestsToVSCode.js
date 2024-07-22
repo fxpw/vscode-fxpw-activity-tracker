@@ -6,7 +6,7 @@ class _requests {
 
 	static Send(event, data = null) {
 		try {
-			console.log(event, data);
+			// console.log(event, data);
 			this.vscode.postMessage({
 				event: event,
 				data: data,
@@ -23,7 +23,7 @@ class _eventListener {
 		window.addEventListener('message', async response => {
 			try {
 				let data = response.data;
-				console.log(data);
+				// console.log(data);
 				switch (data.event) {
 					case 'GetRootPathMapDataResponse':
 						updateHeader("/");

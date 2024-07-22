@@ -92,7 +92,7 @@ export class _trackerData {
 			}
 			return [];
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 			return [];
 		}
 	}

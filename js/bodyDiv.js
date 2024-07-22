@@ -14,7 +14,7 @@ function CreateListOfProjects(response) {
 
 	let mainFrameContainer = _frames.CreateContainer("ProjectsFrame");
 	data.sort((a, b) => b.totalTime - a.totalTime);
-	data.forEach((projectData) =>{
+	data.forEach((projectData) => {
 		let button = _frames.CreateContainerListButton(
 			"GetRootPathAllDataRequest",
 			{
@@ -40,10 +40,22 @@ function CreateListOfFiles(response) {
 	bodyElement.appendChild(filesFrameContainer);
 	let totalTimeSpent = 0;
 
+	let projectTimeByDate = {};
+
 	for (const filePath in data) {
 		if (data.hasOwnProperty(filePath)) {
 			let fileContents = data[filePath];
 			totalTimeSpent += fileContents.reduce((total, entry) => total + entry.timeSpend, 0);
+
+			fileContents.forEach(entry => {
+				let date = new Date(entry.createdAt).toLocaleDateString();
+				let timeSpend = entry.timeSpend;
+
+				if (!projectTimeByDate[date]) {
+					projectTimeByDate[date] = 0;
+				}
+				projectTimeByDate[date] += timeSpend; // Суммируем время для этой даты
+			});
 		}
 	}
 
@@ -67,7 +79,57 @@ function CreateListOfFiles(response) {
 		}
 	}
 
-	
+	let labels = Object.keys(projectTimeByDate).sort((a, b) => {
+		const [dayA, monthA, yearA] = a.split('.').map(Number);
+		const [dayB, monthB, yearB] = b.split('.').map(Number);
+		
+		const dateA = new Date(yearA, monthA - 1, dayA);
+		const dateB = new Date(yearB, monthB - 1, dayB);
+		
+		return dateA - dateB;
+	});
+	const totalTimes = labels.map(date => {
+		// Получаем время для текущей даты
+		return projectTimeByDate[date] / 1000 / 60; // Преобразуем в минуты
+	});
+
+	const ctx = document.createElement('canvas');
+	filesFrameContainer.appendChild(ctx);
+
+	new Chart(ctx, {
+		type: 'line',
+		data: {
+			labels: labels,
+			datasets: [
+				{
+					label: 'Общее время, проведенное в проекте (минуты)',
+					data: totalTimes,
+					backgroundColor: 'rgba(75, 192, 192, 0.2)',
+					borderColor: 'rgba(75, 192, 192, 1)',
+					borderWidth: 1,
+					fill: true,
+				}
+			]
+		},
+		options: {
+			scales: {
+				y: {
+					beginAtZero: true,
+					title: {
+						display: true,
+						text: 'Время (минуты)'
+					}
+				},
+				x: {
+					title: {
+						display: true,
+						text: 'Дата'
+					}
+				}
+			}
+		}
+	});
+
 	fileTimeDataArray.sort((a, b) => b.timeSpendInMilisec - a.timeSpendInMilisec);
 
 	fileTimeDataArray.forEach(fileData => {
@@ -86,9 +148,9 @@ function CreateListOfFiles(response) {
 	bodyElement.appendChild(filesFrameContainer);
 }
 
+
 function CreateFileInfoFrame(response) {
 	let data = response.data;
-	console.log(response);
 	let bodyElement = document.getElementById('body');
 	bodyElement.innerHTML = '';
 
@@ -139,7 +201,7 @@ function CreateFileInfoFrame(response) {
 	const ctx = document.createElement('canvas');
 	fileFrameContainer.appendChild(ctx);
 
-	const myChart = new Chart(ctx, {
+	new Chart(ctx, {
 		type: 'line', // Или 'bar' для столбчатой диаграммы
 		data: {
 			labels: labels,
@@ -202,7 +264,6 @@ function CreateFileInfoFrame(response) {
 function updateBody(response) {
 	try {
 		CreateListOfProjects(response);
-		console.log(response);
 	} catch (error) {
 		console.error(error);
 	}
