@@ -2,9 +2,7 @@
 
 ## Features
 
-## Requirements
-
-## Extension Settings
+more things in tracker
 
 ## Release Notes
 
