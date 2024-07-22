@@ -1,5 +1,7 @@
 # Extension for trace your file and language activity
 
+![1721655490221](image/README/1721655490221.png)
+![1721655510279](image/README/1721655510279.png)
 ## Features
 
 more things in tracker
