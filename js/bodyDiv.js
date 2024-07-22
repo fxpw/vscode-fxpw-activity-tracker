@@ -8,14 +8,21 @@ function formatTime(ms) {
 }
 
 function CreateListOfProjects(response) {
-	let data = response.data;
+	let { data } = response;
 	let bodyElement = document.getElementById('body');
 	bodyElement.innerHTML = '';
 
 	let mainFrameContainer = _frames.CreateContainer("ProjectsFrame");
-
-	data.forEach(function (projectName) {
-		let button = _frames.CreateContainerListButton("GetRootPathAllDataRequest",projectName, projectName);
+	data.sort((a, b) => b.totalTime - a.totalTime);
+	data.forEach((projectData) =>{
+		let button = _frames.CreateContainerListButton(
+			"GetRootPathAllDataRequest",
+			{
+				projectName: projectData.projectName,
+			},
+			projectData.projectName,
+			formatTime(projectData.totalTime)
+		);
 		mainFrameContainer.appendChild(button);
 	});
 
@@ -31,10 +38,6 @@ function CreateListOfFiles(response) {
 
 	let filesFrameContainer = _frames.CreateContainer("FilesFrame");
 	bodyElement.appendChild(filesFrameContainer);
-	// let chartContainer = _frames.CreateContainer("ChartContainerFrame");
-	// chartContainer.className = 'container chartContainer';
-	// filesFrameContainer.appendChild(chartContainer);
-
 	let totalTimeSpent = 0;
 
 	for (const filePath in data) {
@@ -56,7 +59,7 @@ function CreateListOfFiles(response) {
 
 			fileTimeDataArray.push({
 				filePath: filePath,
-				fileName:fileName,
+				fileName: fileName,
 				timeSpend: timeSpend,
 				percent: percent,
 				timeSpendInMilisec: timeSpendInMilisec
@@ -64,16 +67,136 @@ function CreateListOfFiles(response) {
 		}
 	}
 
+	
 	fileTimeDataArray.sort((a, b) => b.timeSpendInMilisec - a.timeSpendInMilisec);
 
 	fileTimeDataArray.forEach(fileData => {
-		let button = _frames.CreateContainerListButton("no",fileData.filePath, fileData.filePath, `${fileData.timeSpend} (${fileData.percent}%)`);
+		let button = _frames.CreateContainerListButton(
+			"GetRootPathAndFilePathDataRequest",
+			{
+				projectName: response.projectName,
+				filePath: fileData.filePath,
+			},
+			fileData.filePath,
+			`${fileData.timeSpend} (${fileData.percent}%)`
+		);
 		filesFrameContainer.appendChild(button);
 	});
 
-
 	bodyElement.appendChild(filesFrameContainer);
 }
+
+function CreateFileInfoFrame(response) {
+	let data = response.data;
+	console.log(response);
+	let bodyElement = document.getElementById('body');
+	bodyElement.innerHTML = '';
+
+	let fileFrameContainer = _frames.CreateContainer("FileFrame");
+	bodyElement.appendChild(fileFrameContainer);
+
+	const fileInfo = document.createElement('h2');
+	fileInfo.innerText = `Файл: ${response.filePath}`; // или другой текст описания
+	fileFrameContainer.appendChild(fileInfo);
+
+	let timeSpendData = [];
+
+	data.forEach(entry => {
+		// Преобразование времени в локальный формат даты
+		let date = new Date(entry.createdAt).toLocaleDateString();
+		let timeSpent = entry.timeSpend; // Время, проведенное в файле
+
+		// Если запись по данной дате ещё не существует, создаем новую
+		if (!timeSpendData[date]) {
+			timeSpendData[date] = { totalTime: 0, visits: 0, createdAt: entry.createdAt }; // Сохраняем время и количество заходов
+		}
+
+		// Увеличиваем общее время и счетчик заходов
+		timeSpendData[date].totalTime += timeSpent;
+		timeSpendData[date].visits += 1; // Увеличиваем счетчик заходов
+	});
+
+	// Преобразование объекта в массив для построения графика
+	let visitCountData = [];
+	for (let date in timeSpendData) {
+		visitCountData.push({
+			date: date,
+			totalTime: timeSpendData[date].totalTime / 1000 / 60, // Преобразуем в минуты
+			visits: timeSpendData[date].visits,
+			createdAt: timeSpendData[date].createdAt // Сохраняем для сортировки
+		});
+	}
+
+	// Сортировка массива visitCountData по созданной дате (createdAt)
+	visitCountData.sort((a, b) => a.createdAt - b.createdAt); // Сравнение по времени
+
+	// Заполнение массивов для графика
+	let labels = visitCountData.map(entry => entry.date);
+	let totalTimes = visitCountData.map(entry => entry.totalTime);
+	let visits = visitCountData.map(entry => entry.visits);
+
+	// Создание графика
+	const ctx = document.createElement('canvas');
+	fileFrameContainer.appendChild(ctx);
+
+	const myChart = new Chart(ctx, {
+		type: 'line', // Или 'bar' для столбчатой диаграммы
+		data: {
+			labels: labels,
+			datasets: [
+				{
+					label: 'Общее время, проведенное за день (минуты)',
+					data: totalTimes,
+					backgroundColor: 'rgba(75, 192, 192, 0.2)',
+					borderColor: 'rgba(75, 192, 192, 1)',
+					borderWidth: 1,
+					yAxisID: 'y1'
+				},
+				{
+					label: 'Количество заходов в файл',
+					data: visits,
+					backgroundColor: 'rgba(255, 99, 132, 0.2)',
+					borderColor: 'rgba(255, 99, 132, 1)',
+					borderWidth: 1,
+					yAxisID: 'y2'
+				}
+			]
+		},
+		options: {
+			scales: {
+				y1: {
+					type: 'linear',
+					position: 'left',
+					beginAtZero: true,
+					title: {
+						display: true,
+						text: 'Время (минуты)'
+					}
+				},
+				y2: {
+					type: 'linear',
+					position: 'right',
+					beginAtZero: true,
+					grid: {
+						drawOnChartArea: false // Добавляем отступ между осями
+					},
+					title: {
+						display: true,
+						text: 'Количество заходов'
+					}
+				},
+				x: {
+					title: {
+						display: true,
+						text: 'Дата'
+					}
+				}
+			}
+		}
+	});
+}
+
+
 
 // eslint-disable-next-line no-unused-vars
 function updateBody(response) {

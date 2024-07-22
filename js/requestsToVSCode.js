@@ -4,11 +4,12 @@ class _requests {
 
 	static vscode = acquireVsCodeApi();
 
-	static Send(event,data=null) {
+	static Send(event, data = null) {
 		try {
+			console.log(event, data);
 			this.vscode.postMessage({
 				event: event,
-				data:data,
+				data: data,
 			});
 
 		} catch (error) {
@@ -25,13 +26,26 @@ class _eventListener {
 				console.log(data);
 				switch (data.event) {
 					case 'GetRootPathMapDataResponse':
+						updateHeader("/");
 						CreateListOfProjects(data);
 						break;
 					case 'GetRootPathAllDataResponse':
+						updateHeader(
+							`/${data.projectName}`,
+							"GetRootPathMapDataRequest",
+							{}
+						);
 						CreateListOfFiles(data);
 						break;
 					case 'GetRootPathAndFilePathDataResponse':
-						// GetRootPathAndFilePathDataResponse(message);
+						updateHeader(
+							`${data.filePath}`,
+							"GetRootPathAllDataRequest",
+							{
+								projectName: data.projectName,
+							}
+						);
+						CreateFileInfoFrame(data);
 						break;
 					case 'GetAllDataResponse':
 						// GetAllDataResponse(message);
@@ -48,7 +62,7 @@ class _eventListener {
 
 	static Init() {
 		this.InitEventResponse();
-		document.addEventListener('DOMContentLoaded', function() {
+		document.addEventListener('DOMContentLoaded', function () {
 			try {
 				updateHeader();
 				updateBodyMainFrameRequest();

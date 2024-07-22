@@ -1,12 +1,22 @@
 
 
 class _frames {
-	static CreateHeaderButton(id, svgD) {
+	static CreateHeaderButton(id = null, requestName = null, requestData = null, svgD = null) {
 		let svgNS = "http://www.w3.org/2000/svg";
 
 		let button = document.createElement('button');
 		button.id = id;
 		button.className = 'headerButton';
+		if (requestName) {
+			button.addEventListener('click', function () {
+				_requests.Send(
+					requestName,
+					{
+						requestData: requestData,
+					}
+				);
+			});
+		}
 
 		let svgElementHome = document.createElementNS(svgNS, "svg");
 		svgElementHome.setAttribute("width", "24");
@@ -29,30 +39,30 @@ class _frames {
 		return spacer;
 	}
 
-	static CreateContainer(id){
+	static CreateContainer(id) {
 		let container = document.createElement('div');
 		container.id = id;
 		container.className = 'container';
 		return container;
 	}
 
-	static CreateContainerListButton(requestName,requestData,textleft,textright=null){
+	static CreateContainerListButton(requestName, requestData, textleft, textright = null) {
 		let button = document.createElement('button');
 		button.className = "containerListButton";
-		
+
 		button.addEventListener('click', function () {
-			_requests.Send(requestName,{
-				name:requestData,
+			_requests.Send(requestName, {
+				requestData: requestData,
 			});
 		});
 
 		let buttonTextLeft = document.createElement('span');
 		buttonTextLeft.textContent = textleft;
 		buttonTextLeft.className = 'containerListButtonText left';
-		
+
 		button.appendChild(buttonTextLeft);
-		
-		if(textright){
+
+		if (textright) {
 
 			let spacer = this.CreateSpacer();
 			button.appendChild(spacer);
@@ -60,7 +70,7 @@ class _frames {
 			let buttonTextRight = document.createElement('span');
 			buttonTextRight.textContent = textright;
 			buttonTextRight.className = 'containerListButtonText right';
-			
+
 			button.appendChild(buttonTextRight);
 
 		}

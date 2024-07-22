@@ -105,6 +105,16 @@ export class _tracker {
 			};
 			if(rootPath && filePath){
 				await _trackerData.AddTrackerData(rootPath.name,filePath,newData);
+				for (let i = 0;i<10;i++){
+					let _newData: fileTimeDataInterface = {
+						languageID:languageID,
+						timeSpend: timeInCurrentFile,
+						createdAt: Date.now() - (i * 24 * 60 * 60 * 1000),
+						updatedAt: Date.now() - (i * 24 * 60 * 60 * 1000),
+					};
+					await _trackerData.AddTrackerData(rootPath.name,filePath,_newData);
+				}
+				
 			}else if(filePath){
 				await _trackerData.AddTrackerData("no-projects",filePath,newData);
 			}else{

@@ -64,9 +64,14 @@ export class _trackerData {
 		}
 	}
 
-	static async GetRootPathMapData(): Promise<string[]> {
+	static async GetRootPathMapData(): Promise<{ projectName: string, totalTime: number }[]> {
 		try {
-			return this.fileTimeData.map(entry => entry.rootPath);
+			return this.fileTimeData.map(entry => {
+				const totalTime = entry.files.reduce((acc, file) => {
+					return acc + file.data.reduce((fileAcc, data) => fileAcc + data.timeSpend, 0);
+				}, 0);
+				return { projectName: entry.rootPath, totalTime };
+			});
 		} catch (error) {
 			console.error(error);
 			return [];

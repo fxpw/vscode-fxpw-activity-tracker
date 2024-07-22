@@ -64,14 +64,23 @@ export class trackerViewProvider implements vscode.WebviewViewProvider {
 						});
 						break;
 					case 'GetRootPathAllDataRequest':
-						if(message.data && message.data.name){
+						if(message.data && message.data.requestData && message.data.requestData.projectName){
 							webviewView.webview.postMessage({
 								event:"GetRootPathAllDataResponse",
-								data:await _trackerData.GetRootPathAllData(message.data.name),
+								data:await _trackerData.GetRootPathAllData(message.data.requestData.projectName),
+								projectName: message.data.requestData.projectName,
 							});
 						}
 						break;
 					case 'GetRootPathAndFilePathDataRequest':
+						if(message.data && message.data.requestData && message.data.requestData.projectName && message.data.requestData.filePath){
+							webviewView.webview.postMessage({
+								event:"GetRootPathAndFilePathDataResponse",
+								data:await _trackerData.GetRootPathAndFilePathData(message.data.requestData.projectName,message.data.requestData.filePath),
+								projectName: message.data.requestData.projectName,
+								filePath:message.data.requestData.filePath
+							});
+						}
 						break;
 					case 'GetAllDataRequest':
 						break;
