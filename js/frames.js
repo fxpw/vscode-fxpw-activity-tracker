@@ -36,13 +36,13 @@ class _frames {
 		return container;
 	}
 
-	static CreateContainerListButton(requestName,textleft,textright=null){
+	static CreateContainerListButton(requestName,requestData,textleft,textright=null){
 		let button = document.createElement('button');
 		button.className = "containerListButton";
 		
 		button.addEventListener('click', function () {
-			_requests.Send("GetRootPathAllDataRequest",{
-				name:requestName,
+			_requests.Send(requestName,{
+				name:requestData,
 			});
 		});
 

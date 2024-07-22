@@ -2,7 +2,8 @@
 	"name": "vscode-fxpw-activity-tracker",
 	"displayName": "vscode-fxpw-activity-tracker",
 	"description": "vscode-fxpw-activity-tracker",
-	"version": "1.0.@VERSION_FROM_RUNNER@",
+	"publisher": "fxpw",
+	"version": "1.0.1",
 	"engines": {
 		"vscode": "^1.91.0"
 	},

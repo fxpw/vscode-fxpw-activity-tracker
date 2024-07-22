@@ -15,7 +15,7 @@ function CreateListOfProjects(response) {
 	let mainFrameContainer = _frames.CreateContainer("ProjectsFrame");
 
 	data.forEach(function (projectName) {
-		let button = _frames.CreateContainerListButton(projectName, projectName);
+		let button = _frames.CreateContainerListButton("GetRootPathAllDataRequest",projectName, projectName);
 		mainFrameContainer.appendChild(button);
 	});
 
@@ -37,7 +37,6 @@ function CreateListOfFiles(response) {
 
 	let totalTimeSpent = 0;
 
-	// Считаем общее время, затраченное на все файлы
 	for (const filePath in data) {
 		if (data.hasOwnProperty(filePath)) {
 			let fileContents = data[filePath];
@@ -45,7 +44,6 @@ function CreateListOfFiles(response) {
 		}
 	}
 
-	// Массив для хранения времени и пути
 	let fileTimeDataArray = [];
 
 	for (const filePath in data) {
@@ -56,7 +54,6 @@ function CreateListOfFiles(response) {
 			let percent = Math.round(((timeSpendInMilisec / totalTimeSpent) * 100) * 10) / 10;
 			let fileName = filePath.split('/').pop();
 
-			// Добавляем данные в массив
 			fileTimeDataArray.push({
 				filePath: filePath,
 				fileName:fileName,
@@ -67,11 +64,10 @@ function CreateListOfFiles(response) {
 		}
 	}
 
-	// Сортируем массив по времени (в миллисекундах) в порядке убывания
 	fileTimeDataArray.sort((a, b) => b.timeSpendInMilisec - a.timeSpendInMilisec);
 
 	fileTimeDataArray.forEach(fileData => {
-		let button = _frames.CreateContainerListButton(fileData.filePath, fileData.filePath, `${fileData.timeSpend} (${fileData.percent}%)`);
+		let button = _frames.CreateContainerListButton("no",fileData.filePath, fileData.filePath, `${fileData.timeSpend} (${fileData.percent}%)`);
 		filesFrameContainer.appendChild(button);
 	});
 
