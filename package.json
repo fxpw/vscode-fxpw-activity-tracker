@@ -13,7 +13,6 @@
 		"onStartupFinished"
 	],
 	"main": "./out/initExtension.js",
-	"browser": "./out/web/initExtension.js",
 	"icon": "images/icon.jpg",
 	"contributes": {
 		"viewsContainers": {
