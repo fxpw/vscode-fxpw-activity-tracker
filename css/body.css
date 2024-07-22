@@ -1,0 +1,27 @@
+body {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	margin: 20px!important;
+	padding: 0!important;
+	color: var(--vscode-editor-foreground);
+	background-color: var(--vscode-editor-background);
+}
+
+/* Улучшения для скроллбара */
+body::-webkit-scrollbar {
+	width: 6px;
+}
+
+body::-webkit-scrollbar-thumb {
+	background: var(--vscode-button-background);
+	border-radius: 4px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+	background: var(--vscode-button-hoverBackground);
+}
+
+
+
+
+
+

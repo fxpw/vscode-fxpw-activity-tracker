@@ -1,0 +1,63 @@
+
+.container {
+	margin: 10px;
+}
+
+.chartContainer {
+    width: 100%; /* или любое нужное вам значение */
+    height: 400px; /* или любое нужное вам значение */
+}
+
+
+.containerListButton {
+	display: block;
+	padding: 10px;
+	margin-bottom: 10px;
+	width: 100%;
+	background-color: var(--vscode-dropdown-background);
+	transition: background-color 0.2s;
+	color: var(--vscode-button-foreground);
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	box-shadow: 0 0 0 0 none;
+	transition: background-color 0.4s, box-shadow 0.4s, padding 0.2s, height 0.4s, max-height 0.4s;
+}
+
+.containerListButton:hover {
+	background-color: var(--vscode-button-hoverBackground);
+	box-shadow: 0 0 2em 0.2em var(--vscode-button-hoverBackground);
+	padding: 15px;
+	max-height: 20vh;
+}
+
+.containerListButton:hover .containerListButtonText {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: ellipsis;
+}
+
+.containerListButton .containerListButtonText{
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: left;
+}
+
+
+/* Стиль для текста внутри кнопки */
+.containerListButtonText {
+    flex: 1;
+}
+
+/* Стиль для правого текста */
+.containerListButtonText.left {
+    text-align: left;
+}
+.containerListButtonText.right {
+    text-align: right;
+}

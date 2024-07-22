@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "tsc", // Используйте команду для компиляции вашего TypeScript
+            "group": {
+                "kind": "build",
+                "isDefault": true // Эта задача будет являться задачей по умолчанию
+            },
+            "problemMatcher": "$tsc", // Шаблон для выявления ошибок TypeScript
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        }
+    ]
+}

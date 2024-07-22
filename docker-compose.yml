@@ -1,7 +1,0 @@
-services:
-  nodejs_template:
-    build:
-      context: "./docker"
-    restart: always
-    volumes:
-      - '.:/app'
