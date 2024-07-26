@@ -82,10 +82,10 @@ function CreateListOfFiles(response) {
 	let labels = Object.keys(projectTimeByDate).sort((a, b) => {
 		const [dayA, monthA, yearA] = a.split('.').map(Number);
 		const [dayB, monthB, yearB] = b.split('.').map(Number);
-		
+
 		const dateA = new Date(yearA, monthA - 1, dayA);
 		const dateB = new Date(yearB, monthB - 1, dayB);
-		
+
 		return dateA - dateB;
 	});
 	const totalTimes = labels.map(date => {
@@ -170,12 +170,16 @@ function CreateFileInfoFrame(response) {
 
 		// Если запись по данной дате ещё не существует, создаем новую
 		if (!timeSpendData[date]) {
-			timeSpendData[date] = { totalTime: 0, visits: 0, createdAt: entry.createdAt }; // Сохраняем время и количество заходов
+			timeSpendData[date] = { totalTime: 0, visits: 0, createdAt: entry.createdAt, entries: [] }; // Сохраняем время и количество заходов
 		}
 
 		// Увеличиваем общее время и счетчик заходов
 		timeSpendData[date].totalTime += timeSpent;
 		timeSpendData[date].visits += 1; // Увеличиваем счетчик заходов
+		timeSpendData[date].entries.push({
+			timeSpent: entry.timeSpend,
+			createdAt: entry.createdAt
+		});
 	});
 
 	// Преобразование объекта в массив для построения графика
@@ -256,10 +260,110 @@ function CreateFileInfoFrame(response) {
 			}
 		}
 	});
+
+	let dayButtonsContainer = _frames.CreateContainer("DaysFrame");
+	bodyElement.appendChild(dayButtonsContainer);
+
+	Object.keys(timeSpendData).forEach(date => {
+		let button = document.createElement('button');
+		button.textContent = date;
+		button.className = 'containerListButton';
+		button.onclick = () => {
+			CreateHourlyGraphFrame(date, timeSpendData[date].entries, response);
+		};
+		dayButtonsContainer.appendChild(button);
+	});
+	bodyElement.appendChild(dayButtonsContainer);
+
 }
 
+function CreateHourlyGraphFrame(selectedDate, entries, response) {
+	updateHeader(
+		`${response.filePath}`,
+		"GetRootPathAndFilePathDataRequest",
+		{
+			projectName: response.projectName,
+			filePath: response.filePath,
+		}
+	);
+
+	let bodyElement = document.getElementById('body');
+	bodyElement.innerHTML = '';
+
+	let dayFrameContainer = _frames.CreateContainer("DayFrame");
+	bodyElement.appendChild(dayFrameContainer);
+
+	const fileInfo = document.createElement('h2');
+	fileInfo.innerText = `Активность в файле ${response.filePath}`;
+	dayFrameContainer.appendChild(fileInfo);
 
 
+
+	const minuteData = Array(144).fill(0); // 144 интервала по 10 минут
+
+	entries.forEach(entry => {
+		const entryDate = new Date(entry.createdAt);
+		const hour = entryDate.getHours();
+		const minute = entryDate.getMinutes();
+		const timeIndex = hour * 6 + Math.floor(minute / 10); // Индекс для каждых 10 минут (6 интервалов в часе)
+
+		// Суммируем время, проведенное в 10-минутном интервале
+		minuteData[timeIndex] += entry.timeSpent;
+	});
+
+	const labels = [];
+	for (let i = 0; i < 144; i++) {
+		const hour = Math.floor(i / 6);
+		const minute = (i % 6) * 10;
+		labels.push(`${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`);
+	}
+
+	const totalTimes = labels.map((label, index) => minuteData[index] / 1000 / 60); // Преобразуем в минуты
+
+	const ctx = document.createElement('canvas');
+	dayFrameContainer.appendChild(ctx);
+
+	const dateInfo = document.createElement('h2');
+	dateInfo.innerText = `${selectedDate}`;
+	dayFrameContainer.appendChild(dateInfo);
+
+	new Chart(ctx, {
+		type: 'line', // Изменяем на линейный график
+		data: {
+			labels: labels,
+			datasets: [{
+				label: 'Время (минуты)',
+				data: totalTimes,
+				backgroundColor: 'rgba(75, 192, 192, 0.2)',
+				borderColor: 'rgba(75, 192, 192, 1)',
+				borderWidth: 1,
+				fill: true,
+				tension: 0.4
+			}]
+		},
+		options: {
+			scales: {
+				y: {
+					title: {
+						display: true,
+						text: 'Время (минуты)',
+					},
+					beginAtZero: true,
+				},
+				x: {
+					title: {
+						display: true,
+						text: 'Время (HH:mm)',
+					},
+					ticks: {
+						autoSkip: true,
+						maxTicksLimit: 12 // Ограничте количество меток по оси X
+					}
+				}
+			}
+		}
+	});
+}
 // eslint-disable-next-line no-unused-vars
 function updateBody(response) {
 	try {
