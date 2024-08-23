@@ -94,8 +94,8 @@ export class trackerViewProvider implements vscode.WebviewViewProvider {
 		});
 	}
 
-	public static Init(context: vscode.ExtensionContext): void {
-		_tracker.Init(context);
+	public static async Init(context: vscode.ExtensionContext): Promise<void> {
+		await _tracker.Init(context);
 		context.subscriptions.push(
 			vscode.window.registerWebviewViewProvider(
 				'vscode-fxpw-activity-tracker-view',

@@ -105,15 +105,6 @@ export class _tracker {
 			};
 			if(rootPath && filePath){
 				await _trackerData.AddTrackerData(rootPath.name,filePath,newData);
-				// for (let i = 0;i<10;i++){
-				// 	let _newData: fileTimeDataInterface = {
-				// 		languageID:languageID,
-				// 		timeSpend: timeInCurrentFile,
-				// 		createdAt: Date.now() - (i * 24 * 60 * 60 * 1000),
-				// 		updatedAt: Date.now() - (i * 24 * 60 * 60 * 1000),
-				// 	};
-				// 	await _trackerData.AddTrackerData(rootPath.name,filePath,_newData);
-				// }
 			}else if(filePath){
 				await _trackerData.AddTrackerData("no-projects",filePath,newData);
 			}else{
@@ -130,11 +121,11 @@ export class _tracker {
 	static async Init(context: vscode.ExtensionContext): Promise<boolean> {
 		try {
 			this.context = context;
-			_trackerData.Init(context);
-			this.InitActiveTextEditorEvent();
-			this.InitChangeWindowState();
-			this.InitCloseTextDocumentEvent();
-			this.InitTestCommand();
+			await _trackerData.Init(context);
+			await this.InitActiveTextEditorEvent();
+			await this.InitChangeWindowState();
+			await this.InitCloseTextDocumentEvent();
+			await this.InitTestCommand();
 			return true;
 		} catch (error) {
 			console.error(error);
