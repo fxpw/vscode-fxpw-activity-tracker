@@ -4,7 +4,8 @@ import { trackerViewProvider } from './trackerViewProvider';
 export async function activate(context: vscode.ExtensionContext) {
 	try {
 		await trackerViewProvider.Init(context);
-		console.log("init vscode-fxpw-activity-tracker version 1.0.11");
+		const version = context.extension.packageJSON.version;
+		console.log(`vscode-fxpw-activity-tracker version: ${version}`);
 	} catch (error) {
 		console.error(error);
 	}
